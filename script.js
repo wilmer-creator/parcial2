@@ -3,41 +3,58 @@
  * Asignatura: Introducción a la Computación Gráfica
  * Estudiante: Wilmer Salamanca
  * 
- * PARTE 7:
- * Limpieza visual, organización del código y ajustes finales.
+ * PARTE 8 - VERSIÓN FINAL
  * 
- * El sistema ya cumple completamente:
- * - Órbita con Punto Medio
- * - Líneas con Bresenham
- * - Distribución trigonométrica
- * - Polígonos generados y dibujados
+ * Sistema de Dispersión Geométrica Orbital:
+ * - Órbita generada con algoritmo de Punto Medio
+ * - Líneas generadas con algoritmo de Bresenham
+ * - Distribución uniforme mediante trigonometría
+ * - Polígonos generados a partir de vértices
+ * 
+ * Restricción cumplida:
+ * Solo se utiliza plotPixel para dibujar en el canvas.
  */
 
 // ======================================================
 // CONFIGURACIÓN DEL CANVAS
 // ======================================================
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+/**
+ * Centro del sistema orbital
+ */
 const centerX = Math.floor(canvas.width / 2);
 const centerY = Math.floor(canvas.height / 2);
 
 // ======================================================
-// PARÁMETROS DEL SISTEMA
+// PARÁMETROS DEL SISTEMA (ALEATORIOS)
 // ======================================================
+
+/**
+ * R: radio de la órbita
+ * N: número de polígonos (4 a 10)
+ * k: número de lados de cada polígono
+ */
 const R = Math.floor(Math.random() * 100) + 120;
 const N = Math.floor(Math.random() * 7) + 4;
 const k = Math.floor(Math.random() * 5) + 3;
 
 /**
- * Tamaño de los polígonos:
- * Se ajusta automáticamente para evitar que se superpongan.
+ * Ajuste automático del tamaño del polígono
+ * para evitar superposición entre ellos.
  */
 const polygonRadius = Math.floor(R / (N + 2));
 
 // ======================================================
-// FUNCIÓN BASE: PÍXEL
+// FUNCIÓN BASE: PLOT PIXEL
 // ======================================================
+
+/**
+ * Dibuja un píxel en el canvas.
+ * Es la única función permitida para renderizar.
+ */
 function plotPixel(ctx, x, y, color = "#000") {
     ctx.fillStyle = color;
     ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
@@ -46,7 +63,14 @@ function plotPixel(ctx, x, y, color = "#000") {
 // ======================================================
 // ALGORITMO DE PUNTO MEDIO (CIRCUNFERENCIA)
 // ======================================================
-function midpointCircle(cx, cy, r, color = "#bbb") {
+
+/**
+ * Dibuja una circunferencia usando el algoritmo de punto medio.
+ * 
+ * Usa un parámetro de decisión (p) para determinar
+ * si el siguiente punto debe moverse solo en x o en x e y.
+ */
+function midpointCircle(cx, cy, r, color = "#ccc") {
 
     let x = 0;
     let y = r;
@@ -54,6 +78,7 @@ function midpointCircle(cx, cy, r, color = "#bbb") {
 
     while (x <= y) {
 
+        // Simetría en 8 octantes
         plotPixel(ctx, cx + x, cy + y, color);
         plotPixel(ctx, cx - x, cy + y, color);
         plotPixel(ctx, cx + x, cy - y, color);
@@ -78,6 +103,13 @@ function midpointCircle(cx, cy, r, color = "#bbb") {
 // ======================================================
 // ALGORITMO DE BRESENHAM (LÍNEAS)
 // ======================================================
+
+/**
+ * Dibuja una línea entre dos puntos.
+ * 
+ * Utiliza un error acumulado (err) como parámetro de decisión.
+ * Funciona en todos los octantes.
+ */
 function bresenhamLine(x0, y0, x1, y1, color = "#000") {
 
     x0 = Math.round(x0);
@@ -114,8 +146,14 @@ function bresenhamLine(x0, y0, x1, y1, color = "#000") {
 }
 
 // ======================================================
-// POSICIONES ORBITALES
+// POSICIONES ORBITALES (TRIGONOMETRÍA)
 // ======================================================
+
+/**
+ * Calcula posiciones equidistantes sobre una circunferencia.
+ * 
+ * θ = 2πi / n
+ */
 function getOrbitalPositions(r, n) {
 
     let positions = [];
@@ -139,6 +177,10 @@ function getOrbitalPositions(r, n) {
 // ======================================================
 // GENERACIÓN DE POLÍGONOS
 // ======================================================
+
+/**
+ * Genera los vértices de un polígono regular.
+ */
 function getPolygonVertices(cx, cy, radius, sides) {
 
     let vertices = [];
@@ -162,6 +204,10 @@ function getPolygonVertices(cx, cy, radius, sides) {
 // ======================================================
 // DIBUJO DE POLÍGONOS
 // ======================================================
+
+/**
+ * Conecta los vértices usando Bresenham.
+ */
 function drawPolygon(vertices, color = "#000") {
 
     for (let i = 0; i < vertices.length; i++) {
@@ -176,14 +222,19 @@ function drawPolygon(vertices, color = "#000") {
 // ======================================================
 // RENDER PRINCIPAL
 // ======================================================
+
+/**
+ * Función principal del sistema.
+ * Dibuja la órbita y los polígonos distribuidos.
+ */
 function drawScene() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Órbita tenue
-    midpointCircle(centerX, centerY, R, "#ccc");
+    // Órbita principal (tenue)
+    midpointCircle(centerX, centerY, R, "#bbb");
 
-    // Posiciones
+    // Obtener centros
     const centers = getOrbitalPositions(R, N);
 
     // Dibujar polígonos
@@ -200,5 +251,8 @@ function drawScene() {
     });
 }
 
-// Ejecutar
+// ======================================================
+// EJECUCIÓN
+// ======================================================
+
 drawScene();
