@@ -3,12 +3,11 @@
  * Asignatura: Introducción a la Computación Gráfica
  * Estudiante: Wilmer Salamanca
  * 
- * PARTE 5:
- * Generación de vértices de polígonos regulares.
- * 
- * En esta fase:
- * - Se construye la geometría de los polígonos
- * - NO se dibujan aún (eso será en la siguiente parte)
+ * PARTE 6:
+ * Integración completa del sistema:
+ * - Generación de polígonos
+ * - Trazado de sus lados con Bresenham
+ * - Composición orbital final
  */
 
 // ======================================================
@@ -28,7 +27,7 @@ const N = Math.floor(Math.random() * 7) + 4;
 const k = Math.floor(Math.random() * 5) + 3;
 
 // ======================================================
-// FUNCIÓN BASE: PIXEL
+// FUNCIÓN BASE
 // ======================================================
 function plotPixel(ctx, x, y, color = "#000") {
     ctx.fillStyle = color;
@@ -129,25 +128,8 @@ function getOrbitalPositions(r, n) {
 }
 
 // ======================================================
-// NUEVA FUNCIÓN: POLÍGONOS
+// POLÍGONOS (VÉRTICES)
 // ======================================================
-
-/**
- * getPolygonVertices:
- * Genera los vértices de un polígono regular.
- * 
- * Se calcula cada vértice usando trigonometría:
- * 
- * x = cx + r * cos(θ)
- * y = cy + r * sin(θ)
- * 
- * @param {number} cx - centro en x
- * @param {number} cy - centro en y
- * @param {number} radius - tamaño del polígono
- * @param {number} sides - número de lados (k)
- * 
- * @returns {Array} [{x, y}, ...]
- */
 function getPolygonVertices(cx, cy, radius, sides) {
 
     let vertices = [];
@@ -169,34 +151,50 @@ function getPolygonVertices(cx, cy, radius, sides) {
 }
 
 // ======================================================
-// RENDER
+// NUEVA FUNCIÓN: DIBUJAR POLÍGONO
+// ======================================================
+
+/**
+ * drawPolygon:
+ * Conecta los vértices de un polígono usando Bresenham.
+ * 
+ * Se recorre el arreglo y se conecta cada punto con el siguiente.
+ * El último vértice se conecta con el primero para cerrar la figura.
+ * 
+ * @param {Array} vertices - arreglo de puntos {x, y}
+ */
+function drawPolygon(vertices, color = "#000") {
+
+    for (let i = 0; i < vertices.length; i++) {
+
+        let p1 = vertices[i];
+        let p2 = vertices[(i + 1) % vertices.length];
+
+        bresenhamLine(p1.x, p1.y, p2.x, p2.y, color);
+    }
+}
+
+// ======================================================
+// RENDER FINAL
 // ======================================================
 function drawScene() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Dibujar órbita
-    midpointCircle(centerX, centerY, R, "#555");
+    // Dibujar órbita (tenue)
+    midpointCircle(centerX, centerY, R, "#888");
 
-    // Centros orbitales
+    // Centros de polígonos
     const centers = getOrbitalPositions(R, N);
 
-    // Visualización:
-    // Dibujamos centros (rojo) y vértices (azul)
+    // Dibujar cada polígono
     centers.forEach(c => {
 
-        // Centro del polígono
-        plotPixel(ctx, c.x, c.y, "red");
-
-        // Obtener vértices
         const vertices = getPolygonVertices(c.x, c.y, 20, k);
 
-        // Dibujar vértices (solo puntos)
-        vertices.forEach(v => {
-            plotPixel(ctx, v.x, v.y, "blue");
-        });
+        drawPolygon(vertices, "#000");
     });
 }
 
-// Ejecutar
+// Ejecutar sistema
 drawScene();
