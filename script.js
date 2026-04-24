@@ -3,11 +3,14 @@
  * Asignatura: Introducción a la Computación Gráfica
  * Estudiante: Wilmer Salamanca
  * 
- * PARTE 6:
- * Integración completa del sistema:
- * - Generación de polígonos
- * - Trazado de sus lados con Bresenham
- * - Composición orbital final
+ * PARTE 7:
+ * Limpieza visual, organización del código y ajustes finales.
+ * 
+ * El sistema ya cumple completamente:
+ * - Órbita con Punto Medio
+ * - Líneas con Bresenham
+ * - Distribución trigonométrica
+ * - Polígonos generados y dibujados
  */
 
 // ======================================================
@@ -20,14 +23,20 @@ const centerX = Math.floor(canvas.width / 2);
 const centerY = Math.floor(canvas.height / 2);
 
 // ======================================================
-// PARÁMETROS ALEATORIOS
+// PARÁMETROS DEL SISTEMA
 // ======================================================
 const R = Math.floor(Math.random() * 100) + 120;
 const N = Math.floor(Math.random() * 7) + 4;
 const k = Math.floor(Math.random() * 5) + 3;
 
+/**
+ * Tamaño de los polígonos:
+ * Se ajusta automáticamente para evitar que se superpongan.
+ */
+const polygonRadius = Math.floor(R / (N + 2));
+
 // ======================================================
-// FUNCIÓN BASE
+// FUNCIÓN BASE: PÍXEL
 // ======================================================
 function plotPixel(ctx, x, y, color = "#000") {
     ctx.fillStyle = color;
@@ -35,9 +44,9 @@ function plotPixel(ctx, x, y, color = "#000") {
 }
 
 // ======================================================
-// CIRCUNFERENCIA (PUNTO MEDIO)
+// ALGORITMO DE PUNTO MEDIO (CIRCUNFERENCIA)
 // ======================================================
-function midpointCircle(cx, cy, r, color = "#aaa") {
+function midpointCircle(cx, cy, r, color = "#bbb") {
 
     let x = 0;
     let y = r;
@@ -67,7 +76,7 @@ function midpointCircle(cx, cy, r, color = "#aaa") {
 }
 
 // ======================================================
-// BRESENHAM (LÍNEAS)
+// ALGORITMO DE BRESENHAM (LÍNEAS)
 // ======================================================
 function bresenhamLine(x0, y0, x1, y1, color = "#000") {
 
@@ -128,7 +137,7 @@ function getOrbitalPositions(r, n) {
 }
 
 // ======================================================
-// POLÍGONOS (VÉRTICES)
+// GENERACIÓN DE POLÍGONOS
 // ======================================================
 function getPolygonVertices(cx, cy, radius, sides) {
 
@@ -151,18 +160,8 @@ function getPolygonVertices(cx, cy, radius, sides) {
 }
 
 // ======================================================
-// NUEVA FUNCIÓN: DIBUJAR POLÍGONO
+// DIBUJO DE POLÍGONOS
 // ======================================================
-
-/**
- * drawPolygon:
- * Conecta los vértices de un polígono usando Bresenham.
- * 
- * Se recorre el arreglo y se conecta cada punto con el siguiente.
- * El último vértice se conecta con el primero para cerrar la figura.
- * 
- * @param {Array} vertices - arreglo de puntos {x, y}
- */
 function drawPolygon(vertices, color = "#000") {
 
     for (let i = 0; i < vertices.length; i++) {
@@ -175,26 +174,31 @@ function drawPolygon(vertices, color = "#000") {
 }
 
 // ======================================================
-// RENDER FINAL
+// RENDER PRINCIPAL
 // ======================================================
 function drawScene() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Dibujar órbita (tenue)
-    midpointCircle(centerX, centerY, R, "#888");
+    // Órbita tenue
+    midpointCircle(centerX, centerY, R, "#ccc");
 
-    // Centros de polígonos
+    // Posiciones
     const centers = getOrbitalPositions(R, N);
 
-    // Dibujar cada polígono
+    // Dibujar polígonos
     centers.forEach(c => {
 
-        const vertices = getPolygonVertices(c.x, c.y, 20, k);
+        const vertices = getPolygonVertices(
+            c.x,
+            c.y,
+            polygonRadius,
+            k
+        );
 
-        drawPolygon(vertices, "#000");
+        drawPolygon(vertices, "#111");
     });
 }
 
-// Ejecutar sistema
+// Ejecutar
 drawScene();
